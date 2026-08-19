@@ -18,9 +18,19 @@ const TEST_SAVES = [
   "dead-alter-day18-miner-alive.sav",
   "dead-alter-day44-miner-dead.sav",
 ];
-const TEST_DATA_BASE = location.pathname.endsWith("/out/") || location.pathname.endsWith("/out/index.html")
-  ? "./test-data/"
-  : "../test-data/";
+
+async function fetchBundledSave(fileName) {
+  // Deployed build (GitHub Pages / web/out) keeps test-data next to index.html.
+  // Dev serve from web/ keeps test-data one directory up.
+  const candidates = ["./test-data/", "../test-data/"];
+  let lastError;
+  for (const base of candidates) {
+    const response = await fetch(`${base}${fileName}`);
+    if (response.ok) return response;
+    lastError = new Error(`HTTP ${response.status} from ${base}${fileName}`);
+  }
+  throw lastError;
+}
 
 const hasFsAccess = "showOpenFilePicker" in window;
 el("fs-hint").textContent = hasFsAccess
@@ -295,10 +305,7 @@ async function loadBundledSave(fileName) {
   const select = el("sample-save-select");
   try {
     select.disabled = true;
-    const response = await fetch(`${TEST_DATA_BASE}${fileName}`);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    const response = await fetchBundledSave(fileName);
     const bytes = new Uint8Array(await response.arrayBuffer());
     await loadFile(new File([bytes], fileName), null);
   } catch (error) {
