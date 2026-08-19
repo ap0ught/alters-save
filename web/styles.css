@@ -110,6 +110,25 @@ h2 { font-size: 1.1rem; margin: 1.75rem 0 .75rem; color: var(--accent); }
 }
 .add-item input { width: 5rem; text-align: right; }
 
+.sample-saves {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  margin-top: .75rem;
+  color: var(--muted);
+  font-size: .9rem;
+  flex-wrap: wrap;
+}
+.sample-saves select {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid #3a3f4a;
+  border-radius: 6px;
+  padding: .4rem .5rem;
+  max-width: 100%;
+}
+
 .pending { list-style: none; padding: 0; margin: .5rem 0 0; }
 .pending li {
   display: flex;

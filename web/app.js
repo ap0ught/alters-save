@@ -12,6 +12,16 @@ const dropZone = el("drop-zone");
 const editor = el("editor");
 const statusLine = el("status");
 
+const TEST_SAVES = [
+  "act0-day1.sav",
+  "act2-day54.sav",
+  "dead-alter-day18-miner-alive.sav",
+  "dead-alter-day44-miner-dead.sav",
+];
+const TEST_DATA_BASE = location.pathname.endsWith("/out/") || location.pathname.endsWith("/out/index.html")
+  ? "./test-data/"
+  : "../test-data/";
+
 const hasFsAccess = "showOpenFilePicker" in window;
 el("fs-hint").textContent = hasFsAccess
   ? "Your browser can save directly back to the file after you grant permission."
@@ -280,6 +290,24 @@ async function loadFile(file, handle) {
   render();
 }
 
+async function loadBundledSave(fileName) {
+  if (!fileName) return;
+  const select = el("sample-save-select");
+  try {
+    select.disabled = true;
+    const response = await fetch(`${TEST_DATA_BASE}${fileName}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    await loadFile(new File([bytes], fileName), null);
+  } catch (error) {
+    setStatus(`Could not load sample save: ${error}`, "error");
+  } finally {
+    select.disabled = false;
+  }
+}
+
 function buildEdits() {
   return JSON.stringify({
     resources: [...state.resourceEdits].map(([name, amount]) => ({ name, amount })),
@@ -388,6 +416,11 @@ el("research-complete").addEventListener("change", updateSaveButton);
 el("save-btn").addEventListener("click", () => void save());
 el("reset-btn").addEventListener("click", () => {
   void loadFile(new File([state.originalBytes], state.fileName), state.handle);
+});
+el("sample-save-select").addEventListener("change", (event) => {
+  const fileName = event.target.value;
+  if (fileName) void loadBundledSave(fileName);
+  event.target.value = "";
 });
 
 // Offline support. Skipped on localhost so dev never fights a stale cache;

@@ -17,7 +17,7 @@
 
 import { createHash } from "node:crypto";
 import {
-  copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync,
+  copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync,
 } from "node:fs";
 import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -84,3 +84,11 @@ writeFileSync(join(outDir, "sw.js"), sw);
 copyFileSync(join(webDir, "sw-killswitch.js"), join(outDir, "sw-killswitch.js"));
 
 console.log(`Built: ${appJsName}, ${pkgJsName}, ${wasmName}, ${cssName}, sw.js (v${swVersion})`);
+
+// 5. Copy bundled test saves so the deployed editor can load samples.
+const testDataSrc = join(dirname(webDir), "test-data");
+const testDataOut = join(outDir, "test-data");
+if (existsSync(testDataSrc)) {
+  cpSync(testDataSrc, testDataOut, { recursive: true, force: true });
+  console.log(`Copied bundled test data to ${testDataOut}`);
+}
