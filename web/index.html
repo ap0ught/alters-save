@@ -68,6 +68,14 @@
 
     <h2>Items</h2>
     <p id="items-note" class="muted" hidden></p>
+    <div id="items-bulk" class="bulk-items">
+      <label>Set every stack to</label>
+      <input id="bulk-set-count" type="number" min="0" max="999999" value="10">
+      <button id="bulk-set-btn" type="button">Set all</button>
+      <span class="muted">or add</span>
+      <input id="bulk-add-count" type="number" min="0" max="999999" value="10">
+      <button id="bulk-add-btn" type="button">Add to all</button>
+    </div>
     <div id="items" class="grid"></div>
 
     <div id="add-item-row" class="add-item">

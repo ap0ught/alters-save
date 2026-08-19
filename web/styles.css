@@ -129,6 +129,24 @@ h2 { font-size: 1.1rem; margin: 1.75rem 0 .75rem; color: var(--accent); }
   max-width: 100%;
 }
 
+.bulk-items {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin: .5rem 0 .75rem;
+}
+.bulk-items input {
+  width: 5rem;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid #3a3f4a;
+  border-radius: 6px;
+  padding: .3rem .4rem;
+  text-align: right;
+}
+.bulk-items label, .bulk-items span { font-size: .9rem; }
+
 .pending { list-style: none; padding: 0; margin: .5rem 0 0; }
 .pending li {
   display: flex;
