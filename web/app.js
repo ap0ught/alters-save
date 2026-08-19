@@ -65,7 +65,7 @@ function setStatus(message, kind = "") {
   statusLine.className = kind;
 }
 
-function fieldRow(name, value, onChange) {
+function fieldRow(name, value, onChange, originalValue = value) {
   const row = document.createElement("div");
   row.className = "field";
   const label = document.createElement("label");
@@ -73,14 +73,15 @@ function fieldRow(name, value, onChange) {
   const input = document.createElement("input");
   input.type = "number";
   input.min = "0";
-  input.max = "9999";
+  input.max = "999999";
   input.value = String(value);
   input.addEventListener("input", () => {
     const parsed = Number.parseInt(input.value, 10);
-    const changed = Number.isFinite(parsed) && parsed !== value;
+    const changed = Number.isFinite(parsed) && parsed !== originalValue;
     row.classList.toggle("changed", changed);
     onChange(changed ? parsed : null);
   });
+  if (value !== originalValue) row.classList.add("changed");
   row.append(label, input);
   return row;
 }
@@ -197,17 +198,21 @@ function render() {
   const itemsDiv = el("items");
   itemsDiv.replaceChildren();
   const itemsNote = el("items-note");
+  const itemsBulk = el("items-bulk");
   if (summary.items_error) {
     itemsNote.textContent = `Item stacks unavailable: ${summary.items_error}`;
     itemsNote.hidden = false;
+    itemsBulk.hidden = true;
   } else {
     itemsNote.hidden = true;
+    itemsBulk.hidden = false;
     for (const { name, count } of summary.items) {
-      itemsDiv.append(fieldRow(name, count, (edited) => {
-        if (edited === null) state.itemEdits.delete(name);
-        else state.itemEdits.set(name, edited);
+      const edited = state.itemEdits.get(name);
+      itemsDiv.append(fieldRow(name, edited ?? count, (changed) => {
+        if (changed === null) state.itemEdits.delete(name);
+        else state.itemEdits.set(name, changed);
         updateSaveButton();
-      }));
+      }, count));
     }
   }
 
@@ -428,6 +433,25 @@ el("sample-save-select").addEventListener("change", (event) => {
   const fileName = event.target.value;
   if (fileName) void loadBundledSave(fileName);
   event.target.value = "";
+});
+
+el("bulk-set-btn").addEventListener("click", () => {
+  const value = Number.parseInt(el("bulk-set-count").value, 10);
+  if (!Number.isFinite(value) || value < 0) return;
+  for (const item of state.summary.items) {
+    state.itemEdits.set(item.name, value);
+  }
+  render();
+});
+
+el("bulk-add-btn").addEventListener("click", () => {
+  const delta = Number.parseInt(el("bulk-add-count").value, 10);
+  if (!Number.isFinite(delta) || delta < 0) return;
+  for (const item of state.summary.items) {
+    const current = state.itemEdits.get(item.name) ?? item.count;
+    state.itemEdits.set(item.name, Math.min(current + delta, 999999));
+  }
+  render();
 });
 
 // Offline support. Skipped on localhost so dev never fights a stale cache;
