@@ -40,6 +40,11 @@ fn quest_class_names(body: &[u8]) -> Vec<(usize, String)> {
         let Some(class) = path.rsplit('.').next() else {
             continue;
         };
+        // DataAssets such as DA_QuestCategory_Goals live inside the quest subsystem
+        // but are not quest instances; their deadlines belong to the preceding BP quest.
+        if class.starts_with("DA_") {
+            continue;
+        }
         let stem = class
             .strip_prefix("BP_")
             .unwrap_or(class)
