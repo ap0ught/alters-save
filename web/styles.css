@@ -146,6 +146,17 @@ h2 { font-size: 1.1rem; margin: 1.75rem 0 .75rem; color: var(--accent); }
   text-align: right;
 }
 .bulk-items label, .bulk-items span { font-size: .9rem; }
+.bulk-items label.bulk-check {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+.bulk-items label.bulk-check input {
+  width: auto;
+  margin: 0;
+}
 
 .pending { list-style: none; padding: 0; margin: .5rem 0 0; }
 .pending li {
