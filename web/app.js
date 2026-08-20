@@ -438,8 +438,9 @@ el("sample-save-select").addEventListener("change", (event) => {
 el("bulk-set-btn").addEventListener("click", () => {
   const value = Number.parseInt(el("bulk-set-count").value, 10);
   if (!Number.isFinite(value) || value < 0) return;
+  const capBoolean = el("bulk-cap-boolean").checked;
   for (const item of state.summary.items) {
-    state.itemEdits.set(item.name, value);
+    state.itemEdits.set(item.name, capBoolean && item.count <= 1 ? 1 : value);
   }
   render();
 });
@@ -447,9 +448,14 @@ el("bulk-set-btn").addEventListener("click", () => {
 el("bulk-add-btn").addEventListener("click", () => {
   const delta = Number.parseInt(el("bulk-add-count").value, 10);
   if (!Number.isFinite(delta) || delta < 0) return;
+  const capBoolean = el("bulk-cap-boolean").checked;
   for (const item of state.summary.items) {
-    const current = state.itemEdits.get(item.name) ?? item.count;
-    state.itemEdits.set(item.name, Math.min(current + delta, 999999));
+    if (capBoolean && item.count <= 1) {
+      state.itemEdits.set(item.name, 1);
+    } else {
+      const current = state.itemEdits.get(item.name) ?? item.count;
+      state.itemEdits.set(item.name, Math.min(current + delta, 999999));
+    }
   }
   render();
 });
